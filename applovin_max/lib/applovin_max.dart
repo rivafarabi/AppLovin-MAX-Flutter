@@ -9,6 +9,7 @@ export 'package:applovin_max/src/ad_listeners.dart';
 export 'package:applovin_max/src/enums.dart';
 export 'package:applovin_max/src/targeting_data.dart';
 export 'package:applovin_max/src/max_ad_view.dart';
+export 'package:applovin_max/src/max_native_ad_view.dart';
 
 /// Represents the AppLovin SDK.
 class AppLovinMAX {
@@ -26,6 +27,7 @@ class AppLovinMAX {
   static InterstitialListener? _interstitialListener;
   static RewardedAdListener? _rewardedAdListener;
   static AppOpenAdListener? _appOpenAdListener;
+  static AdViewAdListener? _nativeAdListener;
 
   /// @nodoc
   ///
@@ -124,6 +126,21 @@ class AppLovinMAX {
         _appOpenAdListener?.onAdHiddenCallback.call(createAd(adUnitId, arguments));
       } else if ("OnAppOpenAdRevenuePaid" == method) {
         _appOpenAdListener?.onAdRevenuePaidCallback?.call(createAd(adUnitId, arguments));
+      }
+
+      /// Native Ad Events
+      if ("OnNativeAdLoadedEvent" == method) {
+        _nativeAdListener?.onAdLoadedCallback(createAd(adUnitId, arguments));
+      } else if ("OnNativeAdLoadFailedEvent" == method) {
+        _nativeAdListener?.onAdLoadFailedCallback(adUnitId, createError(arguments));
+      } else if ("OnNativeAdClickedEvent" == method) {
+        _nativeAdListener?.onAdClickedCallback(createAd(adUnitId, arguments));
+      } else if ("OnNativeAdExpandedEvent" == method) {
+        _nativeAdListener?.onAdExpandedCallback(createAd(adUnitId, arguments));
+      } else if ("OnNativeAdCollapsedEvent" == method) {
+        _nativeAdListener?.onAdCollapsedCallback(createAd(adUnitId, arguments));
+      } else if ("OnNativeAdRevenuePaid" == method) {
+        _nativeAdListener?.onAdRevenuePaidCallback?.call(createAd(adUnitId, arguments));
       }
     });
 
@@ -569,6 +586,60 @@ class AppLovinMAX {
       'ad_unit_id': adUnitId,
       'key': key,
       'value': value,
+    });
+  }
+
+  //
+  // NATIVE AD
+  //
+
+  /// Sets an [AdViewAdListener] listener with which you can receive notifications about ad events.
+  static void setNativeAdListener(AdViewAdListener listener) {
+    _bannerAdListener = listener;
+  }
+
+  /// Sets a background color for the native ad with the specified [adUnitId].
+  ///
+  /// Only hex strings ('#xxxxxx') are accepted.
+  static void setNativeAdBackgroundColor(String adUnitId, String hexColorCodeString) {
+    channel.invokeMethod('setNativeAdBackgroundColor', {
+      'ad_unit_id': adUnitId,
+      'hex_color_code': hexColorCodeString,
+    });
+  }
+
+  /// Sets an ad placement name for the native ad with the specified [adUnitId].
+  ///
+  /// [Setting an Ad Placement Name](https://dash.applovin.com/documentation/mediation/features/s2s-impression-revenue-api#setting-an-ad-placement-name)
+  static void setNativeAdPlacement(String adUnitId, String placement) {
+    channel.invokeMethod('setNativeAdPlacement', {
+      'ad_unit_id': adUnitId,
+      'placement': placement,
+    });
+  }
+
+  /// Shows the native ad with the specified [adUnitId].
+  ///
+  /// [Displaying a native ad](https://dash.applovin.com/documentation/mediation/flutter/getting-started/banners#displaying-a-banner)
+  static void showNativeAd(String adUnitId) {
+    channel.invokeMethod('showNativeAd', {
+      'ad_unit_id': adUnitId,
+    });
+  }
+
+  /// Hides the native ad with the specified [adUnitId].
+  ///
+  /// [Displaying a native ad](https://dash.applovin.com/documentation/mediation/flutter/getting-started/banners#displaying-a-banner)
+  static void hideNativeAd(String adUnitId) {
+    channel.invokeMethod('hideNativeAd', {
+      'ad_unit_id': adUnitId,
+    });
+  }
+
+  /// Cleans up system resources allocated for the native ad.
+  static void destroyNativeAd(String adUnitId) {
+    channel.invokeMethod('destroyNativeAd', {
+      'ad_unit_id': adUnitId,
     });
   }
 }

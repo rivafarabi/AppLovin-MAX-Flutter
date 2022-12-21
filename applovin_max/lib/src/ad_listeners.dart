@@ -138,3 +138,22 @@ class AppOpenAdListener extends FullscreenAdListener {
           onAdRevenuePaidCallback: onAdRevenuePaidCallback,
         );
 }
+
+/// Defines an native ad listener.
+class NativeAdListener extends AdListener {
+  /// @nodoc
+  const NativeAdListener({
+    required Function(MaxAd ad) onAdLoadedCallback,
+    required Function(String adUnitId, MaxError error) onAdLoadFailedCallback,
+    required Function(MaxAd ad) onAdDisplayedCallback,
+    required Function(MaxAd ad, MaxError error) onAdDisplayFailedCallback,
+    required Function(MaxAd ad) onAdClickedCallback,
+    required Function(MaxAd ad) onAdHiddenCallback,
+    Function(MaxAd ad)? onAdRevenuePaidCallback,
+  }) : super(
+          onAdLoadedCallback: onAdLoadedCallback,
+          onAdLoadFailedCallback: onAdLoadFailedCallback,
+          onAdClickedCallback: onAdClickedCallback,
+          onAdRevenuePaidCallback: onAdRevenuePaidCallback,
+        );
+}

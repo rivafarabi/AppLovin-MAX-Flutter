@@ -25,6 +25,7 @@ final String _interstitialAdUnitId = Platform.isAndroid ? "ANDROID_INTER_AD_UNIT
 final String _rewardedAdUnitId = Platform.isAndroid ? "ANDROID_REWARDED_AD_UNIT_ID" : "IOS_REWARDED_AD_UNIT_ID";
 final String _bannerAdUnitId = Platform.isAndroid ? "ANDROID_BANNER_AD_UNIT_ID" : "IOS_BANNER_AD_UNIT_ID";
 final String _mrecAdUnitId = Platform.isAndroid ? "ANDROID_MREC_AD_UNIT_ID" : "IOS_MREC_AD_UNIT_ID";
+final String _nativeAdUnitId = Platform.isAndroid ? "ANDROID_MREC_AD_UNIT_ID" : "IOS_MREC_AD_UNIT_ID";
 
 // Create states
 var _isInitialized = false;
@@ -38,6 +39,7 @@ var _isWidgetBannerShowing = false;
 var _isProgrammaticMRecCreated = false;
 var _isProgrammaticMRecShowing = false;
 var _isWidgetMRecShowing = false;
+var _isWidgetNativeAdShowing = false;
 
 var _statusText = "";
 
@@ -212,6 +214,10 @@ class _MyAppState extends State<MyApp> {
     return _isWidgetMRecShowing ? 'Hide Widget MREC' : 'Show Widget MREC';
   }
 
+  String getWidgetNativeAdButtonTitle() {
+    return _isWidgetNativeAdShowing ? 'Hide Widget Native Ad' : 'Show Widget Native Ad';
+  }
+
   void logStatus(String status) {
     /// ignore: avoid_print
     print(status);
@@ -355,6 +361,21 @@ class _MyAppState extends State<MyApp> {
                   )
                 ],
               ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: (_isInitialized)
+                        ? () async {
+                            setState(() {
+                              _isWidgetNativeAdShowing = !_isWidgetNativeAdShowing;
+                            });
+                          }
+                        : null,
+                    child: Text(getWidgetNativeAdButtonTitle()),
+                  )
+                ],
+              ),
               if (_isWidgetBannerShowing)
                 MaxAdView(
                     adUnitId: _bannerAdUnitId,
@@ -389,6 +410,31 @@ class _MyAppState extends State<MyApp> {
                     }, onAdRevenuePaidCallback: (ad) {
                       logStatus('MREC widget ad revenue paid: ${ad.revenue}');
                     })),
+              if (_isWidgetNativeAdShowing)
+                Row(
+                  children: [
+                    Expanded(
+                      child: MaxNativeAdView(
+                          adUnitId: _nativeAdUnitId,
+                          adTemplate: AdTemplate.small,
+                          listener: AdViewAdListener(onAdLoadedCallback: (ad) {
+                            print(ad);
+                            logStatus('Native ad widget ad loaded from ${ad.networkName}');
+                          }, onAdLoadFailedCallback: (adUnitId, error) {
+                            logStatus('Native ad widget ad failed to load with error code ${error.code} and message: ${error.message}');
+                          }, onAdClickedCallback: (ad) {
+                            logStatus('Native ad widget ad clicked');
+                          }, onAdExpandedCallback: (ad) {
+                            logStatus('Native ad widget ad expanded');
+                          }, onAdCollapsedCallback: (ad) {
+                            logStatus('Native ad widget ad collapsed');
+                          }, onAdRevenuePaidCallback: (ad) {
+                            logStatus('Native ad widget ad revenue paid: ${ad.revenue}');
+                          })),
+                    ),
+                    Expanded(child: Container(color: Colors.red),)
+                  ],
+                ),
             ],
           )),
     );

@@ -127,7 +127,9 @@ public class AppLovinMAX
         sharedChannel.setMethodCallHandler( this );
 
         AppLovinMAXAdViewFactory adViewFactory = new AppLovinMAXAdViewFactory( binding.getBinaryMessenger() );
+        AppLovinMAXNativeAdViewFactory nativeAdViewFactory = new AppLovinMAXNativeAdViewFactory( binding.getBinaryMessenger() );
         binding.getPlatformViewRegistry().registerViewFactory( "applovin_max/adview", adViewFactory );
+        binding.getPlatformViewRegistry().registerViewFactory( "applovin_max/native", nativeAdViewFactory );
     }
 
     @Override
